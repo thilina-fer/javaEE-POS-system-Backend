@@ -23,23 +23,22 @@ public class CustomerServlet extends HttpServlet {
         basicDataSource = (BasicDataSource) servletContext.getAttribute("datasource");
     }
 
+    //======================= Save Customers
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(req.getReader(), JsonObject.class);
-        String id = jsonObject.get("id").getAsString();
         String name = jsonObject.get("name").getAsString();
         String address = jsonObject.get("address").getAsString();
         String contact = jsonObject.get("contact").getAsString();
 
         try {
             Connection connection = basicDataSource.getConnection();
-            String query = "INSERT INTO customers (id, name, address, contact) VALUES (?, ?, ?, ?)";
+            String query = "INSERT INTO customers (name, address, contact) VALUES (?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, id);
-            preparedStatement.setString(2, name);
-            preparedStatement.setString(3, address);
-            preparedStatement.setString(4, contact);
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, address);
+            preparedStatement.setString(3, contact);
             int rowsInserted = preparedStatement.executeUpdate();
             if (rowsInserted > 0) {
                 resp.getWriter().println("Customer Saved Successfully");
