@@ -79,6 +79,43 @@ public class CustomerServlet extends HttpServlet {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
 
+    //======================= Update Customers
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doPut(req, resp);
+    }
+
+    //======================= Delete Customers
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String id = req.getParameter("id");
+
+        // 1. මුලින්ම පරීක්ෂා කරන්න id එක null ද කියා
+        if (id == null || id.isEmpty()) {
+            System.out.println("Error: ID parameter is missing in the request!");
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("Customer ID is required");
+            return;
+        }
+
+        try (Connection connection = basicDataSource.getConnection()) {
+            String sql = "DELETE FROM customers WHERE id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+            // 2. දැන් parse කරන්න
+            preparedStatement.setInt(1, Integer.parseInt(id));
+
+            int rowsDeleted = preparedStatement.executeUpdate();
+            if (rowsDeleted > 0) {
+                resp.getWriter().write("Deleted Successfully");
+            } else {
+                resp.setStatus(404);
+                resp.getWriter().write("Customer Not Found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
